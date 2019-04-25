@@ -1,5 +1,5 @@
 /*!
-* Clamp.js 0.5.1
+* Clamp.js 0.5.2
 *
 * Copyright 2011-2013, Joseph Schmitt http://joe.sh
 * Copyright (C) 2019 Glamping Hub (https://glampinghub.com)
