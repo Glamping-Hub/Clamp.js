@@ -1,13 +1,13 @@
 /*!
-* Clamp.js 0.5.2
-*
-* Copyright 2011-2013, Joseph Schmitt http://joe.sh
-* Copyright (C) 2019 Glamping Hub (https://glampinghub.com)
-* Released under the WTFPL license
-* http://sam.zoy.org/wtfpl/
-*/
+ * Clamp.js 0.5.2
+ *
+ * Copyright 2011-2013, Joseph Schmitt http://joe.sh
+ * Copyright (C) 2019 Glamping Hub (https://glampinghub.com)
+ * Released under the WTFPL license
+ * http://sam.zoy.org/wtfpl/
+ */
 
-(function(){
+(function() {
     /**
      * Clamps a text node.
      * @param {HTMLElement} element. Element containing the text node to clamp.
@@ -19,20 +19,25 @@
         var self = this,
             win = window,
             opt = {
-                clamp:              options.clamp || 2,
-                useNativeClamp:     typeof(options.useNativeClamp) != 'undefined' ? options.useNativeClamp : true,
-                splitOnChars:       options.splitOnChars || ['.', '-', '–', '—', ' '], //Split on sentences (periods), hypens, en-dashes, em-dashes, and words (spaces).
-                animate:            options.animate || false,
-                truncationChar:     options.truncationChar || '…',
-                truncationHTML:     options.truncationHTML
+                clamp: options.clamp || 2,
+                useNativeClamp:
+                    typeof options.useNativeClamp != 'undefined'
+                        ? options.useNativeClamp
+                        : true,
+                splitOnChars: options.splitOnChars || ['.', '-', '–', '—', ' '], //Split on sentences (periods), hypens, en-dashes, em-dashes, and words (spaces).
+                animate: options.animate || false,
+                truncationChar: options.truncationChar || '…',
+                truncationHTML: options.truncationHTML
             },
-
             sty = element.style,
             originalText = element.innerHTML,
-
-            supportsNativeClamp = typeof(element.style.webkitLineClamp) != 'undefined',
+            supportsNativeClamp =
+                typeof element.style.webkitLineClamp != 'undefined',
             clampValue = opt.clamp,
-            isCSSValue = clampValue.indexOf && (clampValue.indexOf('px') > -1 || clampValue.indexOf('em') > -1),
+            isCSSValue =
+                clampValue.indexOf &&
+                (clampValue.indexOf('px') > -1 ||
+                    clampValue.indexOf('em') > -1),
             truncationHTMLContainer;
 
         if (opt.truncationHTML) {
@@ -40,8 +45,7 @@
             truncationHTMLContainer.innerHTML = opt.truncationHTML;
         }
 
-
-// UTILITY FUNCTIONS __________________________________________________________
+        // UTILITY FUNCTIONS __________________________________________________________
 
         /**
          * Return the current style for an element.
@@ -57,14 +61,16 @@
                         var re = /(\-([a-z]){1})/g;
                         if (prop == 'float') prop = 'styleFloat';
                         if (re.test(prop)) {
-                            prop = prop.replace(re, function () {
+                            prop = prop.replace(re, function() {
                                 return arguments[2].toUpperCase();
                             });
                         }
-                        return el.currentStyle && el.currentStyle[prop] ? el.currentStyle[prop] : null;
-                    }
+                        return el.currentStyle && el.currentStyle[prop]
+                            ? el.currentStyle[prop]
+                            : null;
+                    };
                     return this;
-                }
+                };
             }
 
             return win.getComputedStyle(elem, null).getPropertyValue(prop);
@@ -78,7 +84,7 @@
             var availHeight = height || element.clientHeight,
                 lineHeight = getLineHeight(element);
 
-            return Math.max(Math.floor(availHeight/lineHeight), 0);
+            return Math.max(Math.floor(availHeight / lineHeight), 0);
         }
 
         /**
@@ -103,8 +109,7 @@
             return parseInt(lh);
         }
 
-
-// MEAT AND POTATOES (MMMM, POTATOES...) ______________________________________
+        // MEAT AND POTATOES (MMMM, POTATOES...) ______________________________________
         var splitOnChars = opt.splitOnChars.slice(0),
             splitChar = splitOnChars[0],
             chunks,
@@ -116,10 +121,17 @@
         function getLastChild(elem) {
             //Current element has children, need to go deeper and get last child as a text node
             if (elem.lastChild.children && elem.lastChild.children.length > 0) {
-                return getLastChild(Array.prototype.slice.call(elem.children).pop());
+                return getLastChild(
+                    Array.prototype.slice.call(elem.children).pop()
+                );
             }
             //This is the absolute last child, a text node, but something's wrong with it. Remove it and keep trying
-            else if (!elem.lastChild || !elem.lastChild.nodeValue || elem.lastChild.nodeValue == '' || elem.lastChild.nodeValue == opt.truncationChar) {
+            else if (
+                !elem.lastChild ||
+                !elem.lastChild.nodeValue ||
+                elem.lastChild.nodeValue == '' ||
+                elem.lastChild.nodeValue == opt.truncationChar
+            ) {
                 elem.lastChild.parentNode.removeChild(elem.lastChild);
                 return getLastChild(element);
             }
@@ -134,7 +146,9 @@
          * height is beneath the passed-in max param.
          */
         function truncate(target, maxHeight) {
-            if (!maxHeight) {return;}
+            if (!maxHeight) {
+                return;
+            }
 
             /**
              * Resets global variables.
@@ -177,8 +191,15 @@
 
             //Insert the custom HTML before the truncation character
             if (truncationHTMLContainer) {
-                target.nodeValue = target.nodeValue.replace(opt.truncationChar, '');
-                element.innerHTML = target.nodeValue + ' ' + truncationHTMLContainer.innerHTML + opt.truncationChar;
+                target.nodeValue = target.nodeValue.replace(
+                    opt.truncationChar,
+                    ''
+                );
+                element.innerHTML =
+                    target.nodeValue +
+                    ' ' +
+                    truncationHTMLContainer.innerHTML +
+                    opt.truncationChar;
             }
 
             //Search produced valid chunks
@@ -187,7 +208,10 @@
                 if (element.clientHeight <= maxHeight) {
                     //There's still more characters to try splitting on, not quite done yet
                     if (splitOnChars.length >= 0 && splitChar != '') {
-                        applyEllipsis(target, chunks.join(splitChar) + splitChar + lastChunk);
+                        applyEllipsis(
+                            target,
+                            chunks.join(splitChar) + splitChar + lastChunk
+                        );
                         chunks = null;
                     }
                     //Finished!
@@ -210,11 +234,13 @@
 
             //If you get here it means still too big, let's keep truncating
             if (opt.animate) {
-                setTimeout(function() {
-                    truncate(target, maxHeight);
-                }, opt.animate === true ? 10 : opt.animate);
-            }
-            else {
+                setTimeout(
+                    function() {
+                        truncate(target, maxHeight);
+                    },
+                    opt.animate === true ? 10 : opt.animate
+                );
+            } else {
                 return truncate(target, maxHeight);
             }
         }
@@ -223,17 +249,17 @@
             elem.nodeValue = str + opt.truncationChar;
         }
 
-
-// CONSTRUCTOR ________________________________________________________________
+        // CONSTRUCTOR ________________________________________________________________
 
         if (clampValue == 'auto') {
             clampValue = getMaxLines();
-        }
-        else if (isCSSValue) {
+        } else if (isCSSValue) {
             clampValue = getMaxLines(parseInt(clampValue));
         }
 
-        var clampedText;
+        var clampedText,
+            height = getMaxHeight(clampValue),
+            isHigher = height < element.clientHeight;
         if (supportsNativeClamp && opt.useNativeClamp) {
             sty.overflow = 'hidden';
             sty.textOverflow = 'ellipsis';
@@ -244,18 +270,17 @@
             if (isCSSValue) {
                 sty.height = opt.clamp + 'px';
             }
-        }
-        else {
-            var height = getMaxHeight(clampValue);
-            if (height < element.clientHeight) {
+        } else {
+            if (isHigher) {
                 clampedText = truncate(getLastChild(element), height);
             }
         }
 
         return {
-            'original': originalText,
-            'clamped': clampedText
-        }
+            original: originalText,
+            clamped: clampedText,
+            wasClamped: isHigher
+        };
     }
 
     window.$clamp = clamp;
